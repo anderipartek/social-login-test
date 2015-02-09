@@ -1,37 +1,82 @@
-<!doctype html>
-
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8">
-
-  <title>The HTML5 Herald</title>
-  <meta name="description" content="The HTML5 Herald">
-  <meta name="author" content="SitePoint"> 
-
-  <!--[if lt IE 9]>
-  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
 </head>
-
 <body>
-
-
-
-
-
-<h1>Cómo: Habilitar la configuración de seguridad de Internet Explorer para la ejecución administrada</h1>
-
-
-<i>Actualización: noviembre 2007</i>
-
-<p>Puesto que Microsoft Internet Explorer puede actuar como host de controles y componentes administrados, su configuración de seguridad puede afectar a la ejecución administrada. Un control administrado puede no ejecutarse en Internet Explorer a menos que estén activados los controles ActiveX y las secuencias de comandos.
-Para habilitar la configuración de seguridad de Internet Explorer</p>
-
-<ol>
-	<li>En Internet Explorer, en el menú Herramientas, haga clic en Opciones de Internet.</li>
-	<li>Haga clic en la ficha Seguridad. En esta ficha puede tener acceso a la configuración de las zonas de Internet, intranet local, sitios de confianza y sitios restringidos.</li>
-	<li>Seleccione la zona en que se origina el control administrado y haga clic en el botón Nivel personalizado. Las casillas Ejecutar controles ActiveX y complementos y Escribir secuencias de comandos para controles ActiveX marcados como seguros para secuencias de comandos deben estar activadas para que se ejecuten los controles ActiveX administrados.</li>
-</ol>
-
+<input type="button"  value="Login" onclick="login()" />
+<input type="button"  value="Logout" onclick="logout()" />
+ 
+<div id="profile"></div>
+<script type="text/javascript">
+ 
+function logout()
+{
+    gapi.auth.signOut();
+    location.reload();
+}
+function login() 
+{
+  var myParams = {
+	//OAuth: ID de cliente para aplicaciones web	  
+    'clientid' : '460625231632-p0n8sme968lcg50g88qaidh737mn04ma.apps.googleusercontent.com',
+    'cookiepolicy' : 'single_host_origin',
+    'callback' : 'loginCallback',
+    'approvalprompt':'force',
+    'scope' : 'https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/plus.profile.emails.read'
+  };
+  gapi.auth.signIn(myParams);
+}
+ 
+function loginCallback(result)
+{
+    if(result['status']['signed_in'])
+    {
+        var request = gapi.client.plus.people.get(
+        {
+            'userId': 'me'
+        });
+        request.execute(function (resp)
+        {
+            var email = '';
+            if(resp['emails'])
+            {
+                for(i = 0; i < resp['emails'].length; i++)
+                {
+                    if(resp['emails'][i]['type'] == 'account')
+                    {
+                        email = resp['emails'][i]['value'];
+                    }
+                }
+            }
+ 
+            var str = "Name:" + resp['displayName'] + "<br>";
+            str += "Image:" + resp['image']['url'] + "<br>";
+            str += "<img src='" + resp['image']['url'] + "' /><br>";
+ 
+            str += "URL:" + resp['url'] + "<br>";
+            str += "Email:" + email + "<br>";
+            document.getElementById("profile").innerHTML = str;
+        });
+ 
+    }
+ 
+}
+function onLoadCallback()
+{
+	//Acceso API publica: Clave para las aplicaciones de navegador	
+    gapi.client.setApiKey('AIzaSyBpJ4XghfmPy5t2UrfzL0wljqfmqbBlp9o');
+    gapi.client.load('plus', 'v1',function(){});
+}
+ 
+    </script>
+ 
+<script type="text/javascript">
+      (function() {
+       var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+       po.src = 'https://apis.google.com/js/client.js?onload=onLoadCallback';
+       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+     })();
+</script>
+ 
 </body>
 </html>
