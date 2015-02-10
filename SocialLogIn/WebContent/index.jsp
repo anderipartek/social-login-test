@@ -270,7 +270,7 @@
 	    }
 	    
 	    //descomentar para llamar ala metodo
-	    // GetWindowsUserName();
+	    GetWindowsUserName();
 	
 	</script>
 
